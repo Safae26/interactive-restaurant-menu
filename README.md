@@ -1,2 +1,46 @@
-# interactive-restaurant-menu
-A modern, feature-rich mobile application built with the Flutter framework, designed to revolutionize the way a restaurant presents its menu to customers. The app moves beyond a simple digital PDF to offer an engaging and interactive experience, allowing users to explore dishes, share their feedback, and easily access restaurant information.
+# 🍽️ Interactive Restaurant Menu
+
+A feature-rich and interactive Flutter mobile application designed to serve as a digital menu for a restaurant. This app allows customers to dynamically explore the menu, engage with dishes, and view restaurant information.
+
+## ✨ Features
+
+- **🏠 Home Page**: Displays the restaurant's name, description, address, phone number, and operating hours.
+- **📖 Tabbed Menu**: Organized by categories (Starters, Main Courses, Desserts, Beverages) for easy browsing.
+- **🖼️ Dish Cards**: Each dish is presented with an image, name, description, and price.
+- **💬 User Interaction**:
+  - Like/Dislike system with counters.
+  - View existing comments for each dish.
+  - Add new comments.
+- **🧭 Intuitive Navigation**:
+  - Side Navigation Drawer to switch between Home, Menu, and Contact pages.
+  - Bottom Navigation Bar for quick access.
+- **⚙️ Advanced Features**:
+  - **Dark Mode**: Toggle between light and dark themes.
+  - **Data Persistence**: User likes, dislikes, and comments are saved locally and persist after the app is closed.
+  - **Favorites System**: Bookmark your favorite dishes for quick access.
+
+## 🛠️ Built With
+
+- **Flutter** - UI toolkit for building natively compiled applications.
+- **Dart** - The programming language used.
+- **shared_preferences** / **hive** - For local data persistence.
+
+## 📸 Screenshots
+
+*(You can add screenshots here later)*
+| Home Screen | Menu with Tabs | Dish Details |
+| :---: | :---: | :---: |
+| ![Home]() | ![Menu]() | ![Details]() |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK installed on your machine.
+- An IDE (like Android Studio or VS Code) with the Flutter/Dart plugins.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/restaurant-menu-app.git
