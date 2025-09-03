@@ -41,6 +41,26 @@ A feature-rich and interactive Flutter mobile application designed to serve as a
 
 ### Installation
 
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/restaurant-menu-app.git
+    ```
+
+2.  **Navigate to the project directory:**
+    ```bash
+    cd restaurant-menu-app
+    ```
+
+3.  **Install the dependencies:**
+    ```bash
+    flutter pub get
+    ```
+
+4.  **Run the application:**
+    ```bash
+    flutter run
+    ```
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/restaurant-menu-app.git
