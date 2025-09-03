@@ -1,0 +1,244 @@
+import 'package:flutter/material.dart';
+import '../models/product.dart';
+
+class ProductFormScreen extends StatefulWidget {
+  final Function(Product) onSubmit;
+  final Product? product;
+  final Map<String, Color> categoryColors;
+
+  const ProductFormScreen({
+    super.key,
+    required this.onSubmit,
+    this.product,
+    required this.categoryColors,
+  });
+
+  @override
+  State<ProductFormScreen> createState() => _ProductFormScreenState();
+}
+
+class _ProductFormScreenState extends State<ProductFormScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late String _name;
+  late String _description;
+  late double _price;
+  late String _category;
+  late String _imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.product != null) {
+      _name = widget.product!.name;
+      _description = widget.product!.description;
+      _price = widget.product!.price;
+      _category = widget.product!.category;
+      _imageUrl = widget.product!.imageUrl;
+    } else {
+      _name = '';
+      _description = '';
+      _price = 0.0;
+      _category = 'Entrées';
+      _imageUrl = '';
+    }
+  }
+
+  void _submit() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      widget.onSubmit(
+        Product(
+          id: widget.product?.id ?? DateTime.now().toString(),
+          name: _name,
+          description: _description,
+          price: _price,
+          category: _category,
+          imageUrl: _imageUrl,
+        ),
+      );
+    }
+  }
+
+  IconData _getIconForCategory(String category) {
+    switch (category) {
+      case 'Entrées':
+        return Icons.restaurant;
+      case 'Plats Principaux':
+        return Icons.restaurant_menu;
+      case 'Desserts':
+        return Icons.cake;
+      case 'Boissons':
+        return Icons.local_drink;
+      default:
+        return Icons.fastfood;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: isDarkMode ? Colors.grey[850] : Colors.white,
+      title: Text(
+        widget.product == null ? 'Ajouter un plat' : 'Modifier le plat',
+        style: TextStyle(
+          color: isDarkMode ? Colors.white : Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  initialValue: _name,
+                  decoration: InputDecoration(
+                    labelText: 'Nom du plat*',
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor:
+                        isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.grey[100],
+                    prefixIcon: Icon(Icons.restaurant, color: Colors.orange),
+                  ),
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  validator: (value) => value!.isEmpty ? 'Ce champ est requis' : null,
+                  onSaved: (value) => _name = value!,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: _description,
+                  decoration: InputDecoration(
+                    labelText: 'Description*',
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor:
+                        isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.grey[100],
+                    prefixIcon: Icon(Icons.description, color: Colors.orange),
+                  ),
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  maxLines: 2,
+                  validator: (value) => value!.isEmpty ? 'Ce champ est requis' : null,
+                  onSaved: (value) => _description = value!,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: _price.toString(),
+                  decoration: InputDecoration(
+                    labelText: 'Prix (€)*',
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor:
+                        isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.grey[100],
+                    prefixIcon: Icon(Icons.euro, color: Colors.orange),
+                    prefixText: '€ ',
+                  ),
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  validator: (value) {
+                    if (value!.isEmpty) return 'Ce champ est requis';
+                    if (double.tryParse(value) == null) return 'Prix invalide';
+                    return null;
+                  },
+                  onSaved: (value) => _price = double.parse(value!),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  initialValue: _imageUrl,
+                  decoration: InputDecoration(
+                    labelText: 'URL de l\'image',
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                    filled: true,
+                    fillColor:
+                        isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.grey[100],
+                    prefixIcon: Icon(Icons.image, color: Colors.orange),
+                  ),
+                  style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                  onSaved: (value) => _imageUrl = value ?? '',
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: _category,
+                  dropdownColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                  decoration: InputDecoration(
+                    labelText: 'Catégorie*',
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                    ),
+                    border: const OutlineInputBorder(),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 12,
+                      horizontal: 12,
+                    ),
+                    prefixIcon: Icon(Icons.category, color: Colors.orange),
+                    filled: true,
+                    fillColor:
+                        isDarkMode ? Colors.grey[800]!.withOpacity(0.5) : Colors.grey[100],
+                  ),
+                  items: widget.categoryColors.keys.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getIconForCategory(category),
+                            color: widget.categoryColors[category],
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            category,
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setState(() => _category = value!),
+                  validator: (value) =>
+                      value == null ? 'Veuillez sélectionner une catégorie' : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('ANNULER'),
+        ),
+        ElevatedButton(
+          onPressed: _submit,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.orange[400],
+            foregroundColor: Colors.white,
+          ),
+          child: const Text('ENREGISTRER'),
+        ),
+      ],
+    );
+  }
+}
