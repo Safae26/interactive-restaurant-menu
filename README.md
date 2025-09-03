@@ -43,12 +43,12 @@ A feature-rich and interactive Flutter mobile application designed to serve as a
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/restaurant-menu-app.git
+    git clone https://github.com/your-username/interactive-restaurant-menu.git
     ```
 
 2.  **Navigate to the project directory:**
     ```bash
-    cd restaurant-menu-app
+    cd interactive-restaurant-menu
     ```
 
 3.  **Install the dependencies:**
@@ -63,4 +63,4 @@ A feature-rich and interactive Flutter mobile application designed to serve as a
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/restaurant-menu-app.git
+   git clone https://github.com/your-username/interactive-restaurant-menu.git
