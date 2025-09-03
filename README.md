@@ -24,14 +24,14 @@ A feature-rich and interactive Flutter mobile application designed to serve as a
 - **Flutter** - UI toolkit for building natively compiled applications.
 - **Dart** - The programming language used.
 - **shared_preferences** / **hive** - For local data persistence.
-
+<!--
 ## 📸 Screenshots
 
 *(You can add screenshots here later)*
 | Home Screen | Menu with Tabs | Dish Details |
 | :---: | :---: | :---: |
 | ![Home]() | ![Menu]() | ![Details]() |
-
+-->
 ## 🚀 Getting Started
 
 ### Prerequisites
