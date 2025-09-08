@@ -33,7 +33,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y curl unzip git wget
 
-    # Step 3: Install NEWER Flutter version (3.35.3 as suggested)
+    # Step 3: Install Flutter
     - name: Install Flutter
       run: |
         cd /tmp
@@ -51,9 +51,9 @@ jobs:
     - name: Get packages
       run: flutter pub get
 
-    # Step 6: BUILD YOUR APP
+    # Step 6: BUILD YOUR APP (FIXED COMMAND)
     - name: Build Flutter web app
-      run: flutter build web --web-renderer html --release
+      run: flutter build web --release
 
     # Step 7: Setup GitHub Pages
     - name: Setup Pages
