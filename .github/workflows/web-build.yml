@@ -1,7 +1,7 @@
 name: Flutter Web Build Test
 
 on:
-  workflow_dispatch:  # Only manual triggers for now
+  workflow_dispatch:
 
 jobs:
   setup-environment:
@@ -10,8 +10,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Print Ubuntu version
-      run: lsb_release -a
+    - name: Install basic dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl unzip git
 
-    - name: Test basic command
-      run: echo "Hello, GitHub Actions is working!"
+    - name: Download and setup Flutter
+      run: |
+        cd /tmp
+        wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.tar.xz
+        tar xf flutter_linux_3.19.0-stable.tar.xz
+        echo "/tmp/flutter/bin" >> $GITHUB_PATH
+
+    - name: Verify Flutter installation
+      run: |
+        which flutter
+        flutter --version
