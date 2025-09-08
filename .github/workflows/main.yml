@@ -2,38 +2,15 @@ name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     runs-on: ubuntu-latest
-    
     steps:
-    # Step 1: Checkout code
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    # Step 2: Install system dependencies
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl unzip git wget
-
-    # Step 3: Install Flutter
+    - uses: actions/checkout@v4
+    
     - name: Install Flutter
       run: |
         cd /tmp
@@ -41,35 +18,32 @@ jobs:
         tar xf flutter_linux_3.35.3-stable.tar.xz
         echo "/tmp/flutter/bin" >> $GITHUB_PATH
 
-    # Step 4: Setup Flutter web
-    - name: Setup Flutter web
+    - name: Setup and build
       run: |
         flutter config --enable-web
-        flutter --version
+        flutter create . --platforms web --overwrite
+        flutter pub get
+        flutter build web --release
 
-    # Step 5: ADD WEB PLATFORM TO YOUR PROJECT
-    - name: Add web platform support
-      run: flutter create . --platforms web --overwrite
+    # FIX THE BASE HREF FOR YOUR SPECIFIC REPOSITORY
+    - name: Fix base URL for GitHub Pages
+      run: |
+        cd build/web
+        # Fix index.html base href
+        sed -i 's|<base href="/">|<base href="/interactive-restaurant-menu/">|' index.html
+        # Fix manifest.json start URL
+        if [ -f manifest.json ]; then
+            sed -i 's|"start_url": "/"|"start_url": "/interactive-restaurant-menu/"|' manifest.json
+        fi
+        # Fix service worker registration (if exists)
+        if [ -f flutter_service_worker.js ]; then
+            sed -i 's|const CACHE_NAME = "flutter-app-cache";|const CACHE_NAME = "interactive-restaurant-menu-cache";|' flutter_service_worker.js
+        fi
 
-    # Step 6: Get dependencies
-    - name: Get packages
-      run: flutter pub get
-
-    # Step 7: Build web app
-    - name: Build Flutter web app
-      run: flutter build web --release
-
-    # Step 8: Setup GitHub Pages
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-
-    # Step 9: Upload built files as artifact
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: build/web/
-
-    # Step 10: Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/web
+        enable_jekyll: false
+        keep_files: false
