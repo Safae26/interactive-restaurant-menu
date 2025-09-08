@@ -9,15 +9,20 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     
-    # ADD PERMISSIONS HERE
     permissions:
-      contents: write  # This is crucial for pushing to gh-pages branch
+      contents: write
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Important for peaceiris action
+        fetch-depth: 0
     
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl unzip git wget
+
     - name: Install Flutter
       run: |
         cd /tmp
@@ -25,28 +30,35 @@ jobs:
         tar xf flutter_linux_3.35.3-stable.tar.xz
         echo "/tmp/flutter/bin" >> $GITHUB_PATH
 
-    - name: Setup and build
+    - name: Setup Flutter web
       run: |
         flutter config --enable-web
-        flutter create . --platforms web --overwrite
-        flutter pub get
-        flutter build web --release
+        flutter --version
+
+    - name: Add web platform support
+      run: flutter create . --platforms web --overwrite
+
+    - name: Get packages
+      run: flutter pub get
+
+    - name: Build Flutter web app
+      run: flutter build web --release
 
     - name: Fix base URL for GitHub Pages
       run: |
         cd build/web
-        sed -i 's|<base href="/">|<base href="/interactive-restaurant-menu/">|' index.html
+        # For root deployment, keep base href as "/"
+        sed -i 's|<base href="/">|<base href="/">|' index.html
+        # Ensure manifest.json points to root
         if [ -f manifest.json ]; then
-            sed -i 's|"start_url": "/"|"start_url": "/interactive-restaurant-menu/"|' manifest.json
+            sed -i 's|"start_url": "/"|"start_url": "/"|' manifest.json
         fi
 
-    # USE PERSONAL ACCESS TOKEN INSTEAD
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/web
-        enable_jekyll: false
-        keep_files: false
-        # Force the deployment even if no changes
-        force_orphan: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        folder: build/web
+        clean: true
+        single-commit: true
