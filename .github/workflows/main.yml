@@ -47,25 +47,29 @@ jobs:
         flutter config --enable-web
         flutter --version
 
-    # Step 5: Get dependencies
+    # Step 5: ADD WEB PLATFORM TO YOUR PROJECT
+    - name: Add web platform support
+      run: flutter create . --platforms web --overwrite
+
+    # Step 6: Get dependencies
     - name: Get packages
       run: flutter pub get
 
-    # Step 6: BUILD YOUR APP (FIXED COMMAND)
+    # Step 7: Build web app
     - name: Build Flutter web app
       run: flutter build web --release
 
-    # Step 7: Setup GitHub Pages
+    # Step 8: Setup GitHub Pages
     - name: Setup Pages
       uses: actions/configure-pages@v4
 
-    # Step 8: Upload built files as artifact
+    # Step 9: Upload built files as artifact
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: build/web/
 
-    # Step 9: Deploy to GitHub Pages
+    # Step 10: Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
