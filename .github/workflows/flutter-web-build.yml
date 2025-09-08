@@ -1,52 +1,44 @@
 name: Flutter Web Build
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events for the main branch
   push:
-    branches: [ "main" ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
+    branches: [ main, master ]
   workflow_dispatch:
 
-# Sets the permissions for the GITHUB_TOKEN to allow deployment to Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  build:
-    # The type of runner that the job will run on
+  build-web:
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Step 1: Checkout the repository code
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # Step 2: Set up the Flutter SDK
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable' # Use the stable channel of Flutter
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0' # Specify a specific version for stability
+        channel: 'stable'
+        cache: true
+        cache-key: flutter-pub-cache
+        cache-path: ${{ runner.tool_cache }}/flutter/pub-cache
 
-      # Step 3: Get all the Flutter package dependencies
-      - name: Install dependencies
-        run: flutter pub get
+    - name: Show Flutter version
+      run: flutter --version
 
-      # Step 4: YOUR COMMAND - Build the web project with the HTML renderer
-      - name: Build Web (HTML Renderer)
-        run: flutter build web --web-renderer html
+    - name: Install dependencies
+      run: flutter pub get
 
-      # Step 5: Optional - Upload the built web files as an artifact.
-      # This allows you to download the compiled build from the Actions tab.
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web_build_output
-          path: build/web/
+    - name: Run flutter doctor
+      run: flutter doctor -v
+
+    - name: Build web with HTML renderer
+      run: flutter build web --web-renderer html --release
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build-output
+        path: build/web/
+        retention-days: 7
