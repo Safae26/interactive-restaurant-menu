@@ -15,26 +15,42 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl unzip git libnss3-dev libatk-bridge2.0-dev libgtk-3-dev
+
+    - name: Install Chrome
+      run: |
+        sudo apt-get install -y wget
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        google-chrome --version
+
+    - name: Install Flutter
+      run: |
+        cd $HOME
+        git clone https://github.com/flutter/flutter.git -b stable --depth 1
+        echo "$HOME/flutter/bin" >> $GITHUB_PATH
+
     - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.19.0' # Specify a specific version for stability
-        channel: 'stable'
-        cache: true
-        cache-key: flutter-pub-cache
-        cache-path: ${{ runner.tool_cache }}/flutter/pub-cache
+      run: |
+        flutter config --enable-web
+        flutter doctor -v
 
-    - name: Show Flutter version
-      run: flutter --version
-
-    - name: Install dependencies
+    - name: Get dependencies
       run: flutter pub get
 
-    - name: Run flutter doctor
-      run: flutter doctor -v
+    - name: Analyze code
+      run: flutter analyze
 
-    - name: Build web with HTML renderer
-      run: flutter build web --web-renderer html --release
+    - name: Build web with HTML renderer (with verbose logging)
+      run: |
+        echo "Building with HTML renderer..."
+        flutter build web --web-renderer html --release --verbose
+      timeout-minutes: 30
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
