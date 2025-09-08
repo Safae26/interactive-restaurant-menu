@@ -1,0 +1,17 @@
+name: Flutter Web Build Test
+
+on:
+  workflow_dispatch:  # Only manual triggers for now
+
+jobs:
+  setup-environment:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Print Ubuntu version
+      run: lsb_release -a
+
+    - name: Test basic command
+      run: echo "Hello, GitHub Actions is working!"
