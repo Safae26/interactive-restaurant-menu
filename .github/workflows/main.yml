@@ -1,31 +1,71 @@
-name: Deploy to GitHub Pages
+name: Deploy Flutter Web to GitHub Pages
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Checkout code
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 2: Install system dependencies
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl unzip git wget
+
+    # Step 3: Install NEWER Flutter version (3.35.3 as suggested)
     - name: Install Flutter
       run: |
         cd /tmp
-        wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.0-stable.tar.xz
-        tar xf flutter_linux_3.19.0-stable.tar.xz
+        wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.35.3-stable.tar.xz
+        tar xf flutter_linux_3.35.3-stable.tar.xz
         echo "/tmp/flutter/bin" >> $GITHUB_PATH
 
-    - name: Setup and build
+    # Step 4: Setup Flutter web
+    - name: Setup Flutter web
       run: |
         flutter config --enable-web
-        flutter pub get
-        flutter build web --web-renderer html --release
+        flutter --version
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    # Step 5: Get dependencies
+    - name: Get packages
+      run: flutter pub get
+
+    # Step 6: BUILD YOUR APP
+    - name: Build Flutter web app
+      run: flutter build web --web-renderer html --release
+
+    # Step 7: Setup GitHub Pages
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    # Step 8: Upload built files as artifact
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build/web
+        path: build/web/
+
+    # Step 9: Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
