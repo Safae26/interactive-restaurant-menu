@@ -8,8 +8,15 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    
+    # ADD PERMISSIONS HERE
+    permissions:
+      contents: write  # This is crucial for pushing to gh-pages branch
+    
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Important for peaceiris action
     
     - name: Install Flutter
       run: |
@@ -25,21 +32,15 @@ jobs:
         flutter pub get
         flutter build web --release
 
-    # FIX THE BASE HREF FOR YOUR SPECIFIC REPOSITORY
     - name: Fix base URL for GitHub Pages
       run: |
         cd build/web
-        # Fix index.html base href
         sed -i 's|<base href="/">|<base href="/interactive-restaurant-menu/">|' index.html
-        # Fix manifest.json start URL
         if [ -f manifest.json ]; then
             sed -i 's|"start_url": "/"|"start_url": "/interactive-restaurant-menu/"|' manifest.json
         fi
-        # Fix service worker registration (if exists)
-        if [ -f flutter_service_worker.js ]; then
-            sed -i 's|const CACHE_NAME = "flutter-app-cache";|const CACHE_NAME = "interactive-restaurant-menu-cache";|' flutter_service_worker.js
-        fi
 
+    # USE PERSONAL ACCESS TOKEN INSTEAD
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
@@ -47,3 +48,5 @@ jobs:
         publish_dir: ./build/web
         enable_jekyll: false
         keep_files: false
+        # Force the deployment even if no changes
+        force_orphan: true
